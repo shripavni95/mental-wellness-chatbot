@@ -2,7 +2,9 @@ import tkinter as tk
 from tkinter import messagebox
 import sqlite3
 import os
-from screens.home import HomeScreen  # ✅ This import is now safe!
+
+# ✅ Delay the HomeScreen import to avoid circular import
+# (Import inside method, not at the top)
 
 class LoginSignupScreen(tk.Tk):
     def __init__(self):
@@ -31,6 +33,8 @@ class LoginSignupScreen(tk.Tk):
         return sqlite3.connect(db_path)
 
     def login_user(self):
+        from screens.home import HomeScreen  # 👈 Import here to break circular dependency
+
         username = self.username_var.get()
         password = self.password_var.get()
         conn = self.get_db_connection()
