@@ -2,7 +2,7 @@ import tkinter as tk
 import time
 import threading
 
-class BreathingScreen(tk.Tk):
+class BreathingExercisesScreen(tk.Tk):  # ✅ Renamed to match import
     def __init__(self, username):
         super().__init__()
         self.username = username
@@ -36,4 +36,4 @@ class BreathingScreen(tk.Tk):
     def on_close(self):
         self.destroy()
         from screens.home import HomeScreen
-        HomeScreen(self.username)
+        HomeScreen(self.username).mainloop()  # ✅ Add mainloop to reopen home

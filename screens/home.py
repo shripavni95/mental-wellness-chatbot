@@ -1,6 +1,8 @@
 import tkinter as tk
 from screens.chatbot import ChatbotScreen
 from screens.mood_tracker import MoodTrackerScreen
+from screens.breathing import BreathingExercisesScreen  
+
 from screens.app_launcher import show_login_signup_screen  # ✅ fixed import
 
 class HomeScreen(tk.Tk):
@@ -15,7 +17,7 @@ class HomeScreen(tk.Tk):
 
         tk.Button(self, text="Chat with Bot", width=25, command=self.open_chatbot).pack(pady=10)
         tk.Button(self, text="Mood Tracker", width=25, command=self.open_mood_tracker).pack(pady=10)
-        tk.Button(self, text="Breathing Exercises", width=25).pack(pady=10)
+        tk.Button(self, text="Breathing Exercises", width=25, command=self.open_breathing).pack(pady=10)
         tk.Button(self, text="Profile / Logout", width=25, command=self.logout_user).pack(pady=10)
 
     def open_chatbot(self):
@@ -25,6 +27,11 @@ class HomeScreen(tk.Tk):
     def open_mood_tracker(self):
         self.destroy()
         MoodTrackerScreen(self.username)
+
+    def open_breathing(self):
+        self.destroy()
+        BreathingExercisesScreen(self.username).mainloop()
+
 
     def logout_user(self):  # ✅ Log out and return to login screen
         self.destroy()
