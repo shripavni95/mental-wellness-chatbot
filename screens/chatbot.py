@@ -10,7 +10,11 @@ chatbot = ChatBot(
     read_only=False,
     storage_adapter="chatterbot.storage.SQLStorageAdapter",
     logic_adapters=[
-        "chatterbot.logic.BestMatch"
+        {
+            "import_path": "chatterbot.logic.BestMatch",
+            "default_response": "I'm here to listen. Can you share more?",
+            "maximum_similarity_threshold": 0.90  # ⬅️ better matching
+        }
     ],
     database_uri="sqlite:///db.sqlite3"
 )
@@ -18,14 +22,14 @@ chatbot = ChatBot(
 # Training setup
 trainer = ChatterBotCorpusTrainer(chatbot)
 
-# Build absolute path to your custom corpus YAML
+# Absolute path to custom YAML file
 custom_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../mental_corpus"))
 custom_file = os.path.join(custom_dir, "mental_health.yml")
 
 if os.path.exists(custom_file):
     try:
-        # Train directly from the .yml file
-        trainer.train(custom_file)
+        # Train using corpus module path if __init__.py exists
+        trainer.train("mental_corpus.mental_health")
         print("✅ Successfully trained on custom mental health corpus.")
     except Exception as e:
         print(f"⚠️ Custom corpus training failed: {e}")
@@ -37,12 +41,13 @@ else:
     trainer.train("chatterbot.corpus.english")
 
 
+# GUI setup
 class ChatbotScreen(tk.Toplevel):
     def __init__(self, username):
         super().__init__()
         self.title(f"Chat with MentalBot - {username}")
         self.geometry("500x500")
-        self.configure(bg="#f0f8ff")  # Light blue background
+        self.configure(bg="#f0f8ff")
 
         self.chat_area = scrolledtext.ScrolledText(
             self,
@@ -70,14 +75,12 @@ class ChatbotScreen(tk.Toplevel):
 
         try:
             reply = chatbot.get_response(user_input)
-            self.chat_area.insert(tk.END, f"MentalBot: {reply}\n\n")
+            self.chat_area.insert(tk.END, f"MentalBot: {reply.text}\n\n")  # ✅ safer than str(reply)
         except Exception as e:
-            self.chat_area.insert(
-                tk.END,
-                "MentalBot: Sorry, I encountered an error.\n\n"
-            )
+            self.chat_area.insert(tk.END, "MentalBot: Sorry, I encountered an error.\n\n")
             print(f"❌ Error getting response: {e}")
 
         self.chat_area.configure(state="disabled")
         self.chat_area.see(tk.END)
         self.entry.delete(0, tk.END)
+ 
