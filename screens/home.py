@@ -1,38 +1,52 @@
 import tkinter as tk
-from screens.chatbot import ChatbotScreen
+from screens.chatbot import ChatBotScreen
 from screens.mood_tracker import MoodTrackerScreen
-from screens.breathing import BreathingExercisesScreen  
+from screens.breathing import BreathingApp
+from screens.login_signup import LoginSignupScreen
 
-from screens.app_launcher import show_login_signup_screen  # ✅ fixed import
-
-class HomeScreen(tk.Tk):
-    def __init__(self, username):
-        super().__init__()
+class HomeScreen:
+    def __init__(self, root, username):
+        self.root = root
         self.username = username
-        self.title("Mental Wellness Chatbot - Home")
-        self.geometry("400x400")
-        self.configure(bg="#e6f9f5")
 
-        tk.Label(self, text=f"Welcome, {self.username}!", font=("Arial", 14), bg="#e6f9f5").pack(pady=10)
+        self.root.title("Home")
+        self.root.geometry("400x400")
 
-        tk.Button(self, text="Chat with Bot", width=25, command=self.open_chatbot).pack(pady=10)
-        tk.Button(self, text="Mood Tracker", width=25, command=self.open_mood_tracker).pack(pady=10)
-        tk.Button(self, text="Breathing Exercises", width=25, command=self.open_breathing).pack(pady=10)
-        tk.Button(self, text="Profile / Logout", width=25, command=self.logout_user).pack(pady=10)
+        welcome_label = tk.Label(root, text=f"Welcome, {username}!", font=("Helvetica", 16))
+        welcome_label.pack(pady=20)
+
+        chatbot_btn = tk.Button(root, text="Chatbot", width=20, command=self.open_chatbot)
+        chatbot_btn.pack(pady=10)
+
+        mood_btn = tk.Button(root, text="Mood Tracker", width=20, command=self.open_mood_tracker)
+        mood_btn.pack(pady=10)
+
+        breathing_btn = tk.Button(root, text="Breathing Exercise", width=20, command=self.open_breathing_exercise)
+        breathing_btn.pack(pady=10)
+
+        logout_btn = tk.Button(root, text="Logout", width=20, command=self.logout)
+        logout_btn.pack(pady=10)
 
     def open_chatbot(self):
-        self.destroy()
-        ChatbotScreen(self.username)
+        self.root.destroy()
+        new_root = tk.Tk()
+        ChatBotScreen(new_root)
+        new_root.mainloop()
 
     def open_mood_tracker(self):
-        self.destroy()
-        MoodTrackerScreen(self.username)
+        self.root.destroy()
+        new_root = tk.Tk()
+        MoodTrackerScreen(new_root, self.username)
+        new_root.mainloop()
 
-    def open_breathing(self):
-        self.destroy()
-        BreathingExercisesScreen(self.username).mainloop()
+    def open_breathing_exercise(self):
+        self.root.destroy()
+        new_root = tk.Tk()
+        BreathingApp(new_root, self.username)
+        new_root.mainloop()
 
-
-    def logout_user(self):  # ✅ Log out and return to login screen
-        self.destroy()
-        show_login_signup_screen()
+    def logout(self):
+        self.root.destroy()
+        new_root = tk.Tk()
+        LoginSignupScreen(new_root)
+        new_root.mainloop()

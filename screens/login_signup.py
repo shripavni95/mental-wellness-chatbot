@@ -3,61 +3,67 @@ from tkinter import messagebox
 import sqlite3
 import os
 
-# ✅ Delay the HomeScreen import to avoid circular import
-# (Import inside method, not at the top)
+class LoginSignupScreen:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Login / Signup")
+        self.root.geometry("400x300")
 
-class LoginSignupScreen(tk.Tk):
-    def __init__(self):
-        super().__init__()
-        self.title("Mental Wellness Chatbot - Login / Signup")
-        self.geometry("400x300")
-        self.configure(bg="#e0f7fa")
-        self.eval('tk::PlaceWindow . center')
-
-        self.username_var = tk.StringVar()
-        self.password_var = tk.StringVar()
-
-        tk.Label(self, text="Username:", bg="#e0f7fa").pack(pady=(20, 5))
-        self.username_entry = tk.Entry(self, textvariable=self.username_var)
+        self.username_label = tk.Label(root, text="Username:")
+        self.username_label.pack()
+        self.username_entry = tk.Entry(root)
         self.username_entry.pack()
 
-        tk.Label(self, text="Password:", bg="#e0f7fa").pack(pady=(10, 5))
-        self.password_entry = tk.Entry(self, textvariable=self.password_var, show="*")
+        self.password_label = tk.Label(root, text="Password:")
+        self.password_label.pack()
+        self.password_entry = tk.Entry(root, show="*")
         self.password_entry.pack()
 
-        tk.Button(self, text="Login", command=self.login_user).pack(pady=(15, 5))
-        tk.Button(self, text="Signup", command=self.signup_user).pack()
+        tk.Button(root, text="Login", command=self.login_user).pack(pady=10)
+        tk.Button(root, text="Signup", command=self.signup_user).pack(pady=10)
 
     def get_db_connection(self):
+        # Use project-relative path for database
         db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "database", "users.db")
-        return sqlite3.connect(db_path)
+        conn = sqlite3.connect(db_path)
+        return conn
 
     def login_user(self):
-        from screens.home import HomeScreen  # 👈 Import here to break circular dependency
+        username = self.username_entry.get()
+        password = self.password_entry.get()
 
-        username = self.username_var.get()
-        password = self.password_var.get()
         conn = self.get_db_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM users WHERE username=? AND password=?", (username, password))
         result = cursor.fetchone()
         conn.close()
+
         if result:
-            self.destroy()
-            HomeScreen(username).mainloop()
+            messagebox.showinfo("Login Success", f"Welcome, {username}!")
+            self.root.destroy()
+            self.open_home_screen(username)
         else:
             messagebox.showerror("Login Failed", "Invalid username or password!")
 
     def signup_user(self):
-        username = self.username_var.get()
-        password = self.password_var.get()
+        username = self.username_entry.get()
+        password = self.password_entry.get()
+
         conn = self.get_db_connection()
         cursor = conn.cursor()
         try:
-            cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, password))
+            cursor.execute(
+                "INSERT INTO users (username, password) VALUES (?, ?)", (username, password)
+            )
             conn.commit()
-            messagebox.showinfo("Success", "Signup successful! Please login.")
+            messagebox.showinfo("Signup Success", "Account created successfully! Please log in.")
         except sqlite3.IntegrityError:
-            messagebox.showerror("Error", "Username already exists.")
+            messagebox.showerror("Signup Failed", "Username already exists.")
         finally:
             conn.close()
+
+    def open_home_screen(self, username):
+        import screens.home  # Delayed import avoids circular import
+        new_root = tk.Tk()
+        screens.home.HomeScreen(new_root, username)
+        new_root.mainloop()

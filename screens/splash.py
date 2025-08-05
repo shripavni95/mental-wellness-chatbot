@@ -1,32 +1,35 @@
 import tkinter as tk
-from tkinter import ttk
-import time
-from screens import login_signup  # We'll create this next
+from screens.login_signup import LoginSignupScreen  # adjust this path if needed
 
-class SplashScreen(tk.Tk):
-    def __init__(self):
-        super().__init__()
-        self.title("Mental Wellness Chatbot")
-        self.geometry("500x300")
-        self.configure(bg="#b2d8d8")  # soft teal/pastel background
-        self.overrideredirect(True)   # removes window decorations
+class SplashScreen:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Welcome")
+        self.root.geometry("600x400")
+        self.root.configure(bg="#DCE6F1")
 
-        # Center the window
-        self.eval('tk::PlaceWindow . center')
-
-        # App title label
-        label = ttk.Label(self, text="Mental Wellness Chatbot\nfor College Students",
-                          font=("Helvetica", 18, "bold"),
-                          background="#b2d8d8", foreground="#0a3d62",
-                          justify="center")
+        # Splash message
+        label = tk.Label(
+            self.root,
+            text="Welcome to the Mental Wellness Chatbot",
+            font=("Helvetica", 16, "bold"),
+            bg="#DCE6F1",
+            fg="#333"
+        )
         label.pack(expand=True)
 
-        # Show splash for 3 seconds then open login screen
-        self.after(3000, self.goto_login)
+        # Go to LoginSignup after 2 seconds
+        self.root.after(2000, self.show_login_signup)
 
-    def goto_login(self):
-        self.destroy()
-        login_signup.LoginSignupScreen()
+    def show_login_signup(self):
+        self.root.destroy()
+        login_root = tk.Tk()
+        app = LoginSignupScreen(login_root)
+        login_root.mainloop()
 
+
+# Only run splash if this is the entry point
 if __name__ == "__main__":
-    SplashScreen().mainloop()
+    root = tk.Tk()
+    app = SplashScreen(root)
+    root.mainloop()

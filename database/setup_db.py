@@ -1,20 +1,7 @@
 import sqlite3
-import os
-
-# Create correct path to users.db
-db_path = os.path.join(os.path.dirname(__file__), "users.db")
-conn = sqlite3.connect(db_path)
+conn = sqlite3.connect("database/users.db")
 cursor = conn.cursor()
-
-# Create the users table
-cursor.execute('''
-CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT NOT NULL UNIQUE,
-    password TEXT NOT NULL
-)
-''')
-
+cursor.execute("CREATE TABLE IF NOT EXISTS users (username TEXT PRIMARY KEY, password TEXT)")
 conn.commit()
 conn.close()
-print("Database tables created successfully.")
+print("✅ User database created.")

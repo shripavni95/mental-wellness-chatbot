@@ -1,11 +1,12 @@
-import tkinter as tk
-from tkinter import messagebox
+import os
 import sqlite3
 from datetime import datetime
+import tkinter as tk
+from tkinter import messagebox
 
 class MoodTrackerScreen(tk.Toplevel):
-    def __init__(self, username):
-        super().__init__()
+    def __init__(self, root, username):
+        super().__init__(root)
         self.title("Mood Tracker")
         self.geometry("400x400")
         self.configure(bg="#e6f2f2")
@@ -23,8 +24,11 @@ class MoodTrackerScreen(tk.Toplevel):
         self.history_text.pack()
         self.history_text.config(state='disabled')
 
+    def get_db_path(self):
+        return os.path.join(os.path.dirname(os.path.dirname(__file__)), "database", "users.db")
+
     def save_mood(self, mood):
-        conn = sqlite3.connect("mental_wellness.db")
+        conn = sqlite3.connect(self.get_db_path())
         c = conn.cursor()
         c.execute("CREATE TABLE IF NOT EXISTS moods (username TEXT, mood TEXT, timestamp TEXT)")
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -34,7 +38,7 @@ class MoodTrackerScreen(tk.Toplevel):
         messagebox.showinfo("Saved", f"Mood '{mood}' saved!")
 
     def show_history(self):
-        conn = sqlite3.connect("mental_wellness.db")
+        conn = sqlite3.connect(self.get_db_path())
         c = conn.cursor()
         c.execute("SELECT mood, timestamp FROM moods WHERE username = ? ORDER BY timestamp DESC LIMIT 5", (self.username,))
         rows = c.fetchall()
